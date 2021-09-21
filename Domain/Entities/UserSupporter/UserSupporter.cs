@@ -14,13 +14,13 @@ namespace Domain.Entities
         [Key]
         public Guid Id { get; set; }
         [Required]
-        public Guid UserId { get; set; }
+        [ForeignKey("User")]
+        public string UserId { get; set; }
         [Required]
+        [ForeignKey("Supporter")]
         public Guid SupporterId { get; set; }
         public DateTime CreateDate { get; set; }
-        [ForeignKey("User")]
         public virtual ApplicationUser User { get; set; }
-        [ForeignKey("SupporterId")]
         public virtual List<Supporter> Supporter { get; set; }
     }
 }

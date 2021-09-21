@@ -10,7 +10,7 @@ namespace Domain.Entities.SocialMedia
         [Key]
         public Guid Id { get; set; }
         [Required]
-        public Guid UserId { get; set; }
+        public string UserId { get; set; }
         [Required,MaxLength(50)]
         public string Title { get; set; }
         [Required,MaxLength(256)]

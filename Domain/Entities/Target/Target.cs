@@ -15,7 +15,7 @@ namespace Domain.Entities
         public Guid Id { get; set; }
         [Required]
         [ForeignKey("User")]
-        public Guid UserId  { get; set; }
+        public string UserId  { get; set; }
         [Required,MaxLength(64),MinLength(3)]
         public string Title { get; set; }
         [Required, MaxLength(500), MinLength(30)]

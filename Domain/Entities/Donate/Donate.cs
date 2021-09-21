@@ -12,7 +12,7 @@ namespace Domain.Entities
         public Guid Id { get; set; }
         [Required]
         [ForeignKey("User")]
-        public Guid UserId { get; set; }
+        public string UserId { get; set; }
         [Required]
         public Guid DonatedUserId { get; set; }
         [MaxLength(300),MinLength(5)]

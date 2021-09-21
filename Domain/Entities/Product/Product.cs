@@ -13,7 +13,7 @@ namespace Domain.Entities
         public Guid Id { get; set; }
         [ForeignKey("User")]
         [Required]
-        public Guid UserId { get; set; }
+        public string UserId { get; set; }
         [Required]
         public decimal Price { get; set; }
         [Required]

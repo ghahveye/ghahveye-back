@@ -15,7 +15,7 @@ namespace Domain.Entities
         public Guid Id { get; set; }
         [Required]
         [ForeignKey("User")]
-        public Guid UserId { get; set; }
+        public string UserId { get; set; }
         public virtual ApplicationUser User { get; set; }
         public virtual IdPayAccount IdPayAccount { get; set; }
     }

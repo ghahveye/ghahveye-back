@@ -12,7 +12,7 @@ namespace Domain.Entities
     {
         public Guid Id { get; set; }
         [ForeignKey("User")]
-        public Guid UserId { get; set; }
+        public string UserId { get; set; }
         [ForeignKey("Product")]
         public Guid ProductId { get; set; }
 

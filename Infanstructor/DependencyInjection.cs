@@ -1,5 +1,5 @@
-﻿using Infanstructor.Persistence;
-using Infanstructor.UserIdentity;
+﻿using Domain.Entities;
+using Infanstructor.Persistence;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
