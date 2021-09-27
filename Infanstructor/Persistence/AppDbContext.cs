@@ -8,10 +8,9 @@ namespace Infanstructor.Persistence
 {
     public class AppDbContext : IdentityDbContext<ApplicationUser>
     {
-        public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
-        {
-            
-        }
+        public AppDbContext(DbContextOptions<AppDbContext> options)
+    : base(options)
+        { }
         public DbSet<BankAccounts> BankAccounts { get; set; }
         public DbSet<BankAccount> bankAccountAccounts { get; set; }
         public DbSet<Chat> Chats { get; set; }

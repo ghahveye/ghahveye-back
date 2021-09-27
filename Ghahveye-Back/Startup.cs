@@ -8,6 +8,9 @@ using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
 using Infanstructor.Persistence;
 using Infanstructor;
+using Application.Contracts;
+using Application.Implementation;
+using System;
 
 namespace Ghahveye_Back
 {
@@ -22,10 +25,12 @@ namespace Ghahveye_Back
 
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
             services.AddControllers();
 
             services.AddInfanstructor(Configuration);
+
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "Ghahveye_Back", Version = "v1" });

@@ -1,5 +1,10 @@
-﻿using Domain.Entities;
+﻿using Application.Authenticate;
+using Application.Contracts;
+using Application.Implementation;
+using Application.Repositories;
+using Domain.Entities;
 using Infanstructor.Persistence;
+using Infanstructor.Repository.UserRepository;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -15,6 +20,14 @@ namespace Infanstructor
     {
         public static IServiceCollection AddInfanstructor(this IServiceCollection services, IConfiguration configuration)
         {
+
+            services.AddTransient<IUserBusinessLogic, UserBusinessLogic>();
+            services.AddTransient<IUserRepository, UserRepository>();
+            services.AddTransient<IAuth,Auth>();
+
+            services.AddMemoryCache();
+
+
             services.AddDbContext<AppDbContext>(options =>
                          options.UseSqlServer(
                              configuration.GetConnectionString("maindb"),
