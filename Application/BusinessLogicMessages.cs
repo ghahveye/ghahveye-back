@@ -13,6 +13,8 @@ namespace Application
             public const string EmailSended = "ایمیل با موفقیت ارسال شد";
             public const string RegisteredSuccess = "ثبت نام با موفقیت انجام شد";
             public const string ResetPassword = "تغییر رمز با موفقیت انجام شد";
+            public const string VerificationEmail = "حساب کاربری شما با موفقیت تایید شد";
+
 
         }
     }

@@ -1,4 +1,5 @@
 ﻿using Application.Contracts;
+using Application.DataTransferObjects.User;
 using Application.EntityMapping.User;
 using Application.Implementation;
 using AutoMapper;
@@ -46,6 +47,36 @@ namespace Ghahveye_Back.Controllers.Authentication
             var res = await _userBusinessLogic.RegisterUserAsync(registerDo);
             return res.Success ? StatusCode(res.Status, res) : StatusCode(res.Status, res);
         }
+
+        [HttpPut("{id}")]
+        public async Task<IActionResult> EmailVerification(Guid id)
+        {
+            var res = await _userBusinessLogic.VerificateEmailAsync(id);
+            return res.Success ? StatusCode(res.Status, res) : StatusCode(res.Status, res);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ForgetPassword(ForgetPassDto forgetPassDto)
+        {
+            var res = await _userBusinessLogic.ForgetPass(forgetPassDto);
+            return res.Success ? StatusCode(res.Status, res) : StatusCode(res.Status, res);
+        }
+
+        [HttpPut("{id}")]
+        public async Task<IActionResult> ResetPassword(ResetPasswordDto resetPasswordDto, Guid id)
+        {
+            var res = await _userBusinessLogic.ResetPass(resetPasswordDto,id);
+            return res.Success ? StatusCode(res.Status, res) : StatusCode(res.Status, res);
+        }
+
+        [HttpPost("{id}")]
+        public async Task<IActionResult> RefreshToken(TokensForRefreshDto tokensForRefreshDto, Guid id)
+        {
+            var res = await _userBusinessLogic.RefreshAsync(tokensForRefreshDto,id);
+            return res.Success ? StatusCode(res.Status, res) : StatusCode(res.Status, res);
+        }
+
+
 
     }
 }

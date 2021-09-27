@@ -21,9 +21,8 @@ namespace Application.Services
             mail.Body = body;
             mail.IsBodyHtml = true;
 
-            SmtpServer.Host = "smtp.iran.liara.ir";
             SmtpServer.Port = 587;
-            SmtpServer.Credentials = new System.Net.NetworkCredential("ghahveye", "GhahveyeMaAliVaBeht4rinStarTu54st!@#$");
+            SmtpServer.Credentials = new System.Net.NetworkCredential("ghahveye.ir@gmail.com", "GhahveyeMaAliVaBeht4rinStarTu54st!@#$");
             SmtpServer.EnableSsl = true;
 
             SmtpServer.Send(mail);

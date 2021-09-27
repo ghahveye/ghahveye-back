@@ -11,7 +11,6 @@ using System.Text;
 using System.Threading.Tasks;
 using Application.Authenticate;
 using Application.Services;
-using System.Web.Http.ModelBinding;
 
 namespace Application.Implementation
 {
@@ -21,7 +20,7 @@ namespace Application.Implementation
         private readonly IAuth _auth;
         private readonly IMapper _mapper;
 
-        public UserBusinessLogic(IUserRepository repository,IAuth auth, IMapper mapper)
+        public UserBusinessLogic(IUserRepository repository, IAuth auth, IMapper mapper)
         {
             _repository = repository;
             _auth = auth;
@@ -30,7 +29,8 @@ namespace Application.Implementation
         public async Task<IBusinessLogicResult> ForgetPass(ForgetPassDto forgetPassDto)
         {
             var user = await _repository.GetUserByEmailAsync(forgetPassDto.Email);
-            if (user != null)
+
+            if (user != null && user.EmailConfirmed)
             {
                 EmailService.Send(forgetPassDto.Email, "تغییر رمز عبور", $"<h1>سلام دوست م</h1> <p>برای تغییر رمز عبور خود بر روی لینک زیر کلیک کنید</p> <br></br> <a href='ghahveye.ir/resetpass/{user.Id}'>تغییر رمز</a>");
                 return new BusinessLogicResult<UserForShowDto>() { Status = 200, Success = true, Message = BusinessLogicMessages.User.EmailSended, Error = null };
@@ -41,7 +41,7 @@ namespace Application.Implementation
             }
         }
 
-   
+
 
         public async Task<IBusinessLogicResult<UserForShowDto>> GetUserAsync(string userName)
         {
@@ -54,7 +54,12 @@ namespace Application.Implementation
         public async Task<IBusinessLogicResult<TokensForShowDto>> LoginUserAsync(LoginDto loginDto)
         {
             var user = await _repository.GetUserByEmailAsync(loginDto.Email);
-            if (user != null && await _repository.CheckPasswordAsync(user, loginDto.Password))
+            if (!user.EmailConfirmed)
+            {
+                return new BusinessLogicResult<TokensForShowDto>() { Status = 400, Error = BusinessLogicErrors.User.VerifyEmail, Success = false };
+
+            }
+            else if (user != null && await _repository.CheckPasswordAsync(user, loginDto.Password))
             {
                 var userRoles = await _repository.GetRolesAsync(user);
 
@@ -100,7 +105,7 @@ namespace Application.Implementation
 
         public async Task<IBusinessLogicResult> RegisterUserAsync(RegisterDto registerDto)
         {
-            
+
             var userByEmail = await _repository.GetUserByEmailAsync(registerDto.Email);
             var userByUsername = await _repository.GetUserByUserByNameAsync(registerDto.UserName);
             if (userByEmail is null && userByUsername is null)
@@ -111,23 +116,15 @@ namespace Application.Implementation
                     CreateDate = DateTime.UtcNow,
                     Email = registerDto.Email,
                 };
-                try
-                {
+                    EmailService.Send(registerDto.Email,"تایید حساب کاربری","تایید این گیخار");
                     await _repository.CreateUserAsync(User, registerDto.Password);
-                    return new BusinessLogicResult() { Error = null, Message =BusinessLogicMessages.User.RegisteredSuccess, Status = 201, Success = true };
+                    return new BusinessLogicResult() { Error = null, Message = BusinessLogicMessages.User.RegisteredSuccess, Status = 201, Success = true };
 
-                }
-                catch (Exception)
-                {
-                    return new BusinessLogicResult() { Error = "some thing went wrong", Message = "ثبت نام  با موفقیت انجام نشد", Status = 400, Success = false };
-
-                    throw;
-                }
 
             }
             else
             {
-                return new BusinessLogicResult() { Error = BusinessLogicErrors.User.UserAlreadyRegistered, Message = "ثبت نام  با موفقیت انجام شد", Status = 201, Success = true };
+                return new BusinessLogicResult() { Error = BusinessLogicErrors.User.UserAlreadyRegistered, Status = 201, Success = true };
             }
 
         }
@@ -137,13 +134,13 @@ namespace Application.Implementation
             throw new NotImplementedException();
         }
 
-        public async Task<IBusinessLogicResult> ResetPass(ResetPasswordDto resetPasswordDto,Guid userId)
+        public async Task<IBusinessLogicResult> ResetPass(ResetPasswordDto resetPasswordDto, Guid userId)
         {
-           var user = await _repository.GetUserByIdAsync(userId);
+            var user = await _repository.GetUserByIdAsync(userId);
             if (user != null)
             {
                 EmailService.Send(user.Email, "تغییر رمز عبور", $"<h1>سلام دوست م</h1><p>رمز حساب کاربری شما تغییر کرده است،اگر از ان اطلاع ندارید به سرعت به پشتیبانی اطلاع بدهید</p>");
-                await _repository.ResetPasswordAsync(userId,resetPasswordDto.Password);
+                await _repository.ResetPasswordAsync(userId, resetPasswordDto.Password);
                 return new BusinessLogicResult<UserForShowDto>() { Status = 200, Success = true, Message = BusinessLogicMessages.User.ResetPassword, Error = null };
             }
             else
@@ -161,6 +158,21 @@ namespace Application.Implementation
         public Task<IBusinessLogicResult<TokensForShowDto>> UpdateUserAsync(UserForUpdateDto userForUpdateDto, string userName, Guid userId)
         {
             throw new NotImplementedException();
+        }
+
+        public async Task<IBusinessLogicResult> VerificateEmailAsync(Guid id)
+        {
+            var user = await _repository.GetUserByIdAsync(id);
+            if (user != null)
+            {
+                user.EmailConfirmed = true;
+                await _repository.SaveChangesAsync();
+                return new BusinessLogicResult<UserForShowDto>() { Status = 200, Success = true, Message = BusinessLogicMessages.User.VerificationEmail, Error = null };
+            }
+            else
+            {
+                return new BusinessLogicResult<UserForShowDto>() { Status = 404, Success = false, Error = BusinessLogicErrors.User.UserDoesNotExist };
+            }
         }
     }
 }

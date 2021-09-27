@@ -12,6 +12,7 @@ namespace Application.Contracts
     {
         Task<IBusinessLogicResult> RegisterUserAsync(RegisterDto registerDto);
         Task<IBusinessLogicResult<TokensForShowDto>> LoginUserAsync(LoginDto loginDto);
+        Task<IBusinessLogicResult> VerificateEmailAsync(Guid id);
         Task<IBusinessLogicResult> ForgetPass(ForgetPassDto forgetPassDto);
         Task<IBusinessLogicResult> ResetPass(ResetPasswordDto resetPasswordDto, Guid userId);
         Task<IBusinessLogicResult<TokensForShowDto>> RefreshAsync(TokensForRefreshDto tokensForRefreshDto, Guid userId);

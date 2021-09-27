@@ -14,10 +14,12 @@ namespace Infanstructor.Repository.UserRepository
     class UserRepository : IUserRepository
     {
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly AppDbContext _context;
 
-        public UserRepository(UserManager<ApplicationUser> userManager)
+        public UserRepository(UserManager<ApplicationUser> userManager,AppDbContext context)
         {
             _userManager = userManager;
+            _context = context;
         }
 
         public async Task<bool> CheckPasswordAsync(ApplicationUser user, string password)
@@ -61,6 +63,11 @@ namespace Infanstructor.Repository.UserRepository
             var user = await GetUserByIdAsync(userId);
             string resetToken = await _userManager.GeneratePasswordResetTokenAsync(user);
             await _userManager.ResetPasswordAsync(user, resetToken, password);
+        }
+
+        public async Task<bool> SaveChangesAsync()
+        {
+            return (await _context.SaveChangesAsync() >= 0);
         }
     }
 }

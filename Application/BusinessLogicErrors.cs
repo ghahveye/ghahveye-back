@@ -15,6 +15,8 @@ namespace Application
             public const string UserDoesNotExistOrRefreshTokenIsInvalid = "کاربر مورد نظر وجود ندارد یا توکن معتبر نمی باشد.";
             public const string UsernameNotAvailable = "نام کاربری قابل استفاده نمی باشد.";
             public const string OtpCodeDoesNotExist = "کد اعتبارسنجی موجود نمی باشد.";
+            public const string VerifyEmail = "حساب کاربری شما فعال نشده است،ابتدا آن را فعال کرده و سپس تلاش مجدد برای ورود کنید";
+
         }
     }
 }
