@@ -1,5 +1,7 @@
 ﻿using Application.Repositories;
 using Domain.Entities;
+using Domain.RequestFeature;
+using Domain.RequestFeatures;
 using Infanstructor.Persistence;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -16,7 +18,7 @@ namespace Infanstructor.Repository.UserRepository
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly AppDbContext _context;
 
-        public UserRepository(UserManager<ApplicationUser> userManager,AppDbContext context)
+        public UserRepository(UserManager<ApplicationUser> userManager, AppDbContext context)
         {
             _userManager = userManager;
             _context = context;
@@ -33,9 +35,24 @@ namespace Infanstructor.Repository.UserRepository
             await _userManager.CreateAsync(user, password);
         }
 
+        public async Task DeleteUserAsync(Guid id)
+        {
+            var users = await    GetUserByIdAsync(id);
+            users.IsDeleted = true;
+            await  SaveChangesAsync();
+        }
+
         public async Task<IEnumerable<ApplicationUser>> GetAllUsersAsync()
         {
             return await _userManager.Users.ToListAsync();
+        }
+
+        public async Task<PagedList<ApplicationUser>> GetAllUsersAsync(RequestParameters requestParameters)
+        {
+            var users = await _context.Users.Where(x=> x.IsBanned == false).Where(x=> x.IsDeleted == false).OrderByDescending(x => x.CreateDate).ToListAsync();
+
+            return PagedList<ApplicationUser>
+                .ToPagedList(users, requestParameters.PageNumber, requestParameters.PageSize);
         }
 
         public async Task<IList<string>> GetRolesAsync(ApplicationUser user)
@@ -58,6 +75,11 @@ namespace Infanstructor.Repository.UserRepository
             return await _userManager.FindByNameAsync(userName);
         }
 
+        public async Task<Profile> GetUserProfile(Guid id)
+        {
+            return await _context.Profiles.FirstOrDefaultAsync(user => user.UserId == id.ToString());
+        }
+
         public async Task ResetPasswordAsync(Guid userId, string password)
         {
             var user = await GetUserByIdAsync(userId);
@@ -68,6 +90,29 @@ namespace Infanstructor.Repository.UserRepository
         public async Task<bool> SaveChangesAsync()
         {
             return (await _context.SaveChangesAsync() >= 0);
+        }
+
+        public async Task UpdateAvatarAsync(string avatar,Guid id)
+        {
+            var user = await GetUserProfile(id);
+            user.Avatar = avatar;
+            await  SaveChangesAsync();
+        }
+
+        public async Task<Profile> UpdateUserAsync(Profile profile, Guid userId)
+        {
+            var user = await GetUserProfile(userId);
+            user.FirstName = profile.FirstName;
+            user.LastName = profile.LastName;
+            user.InvationLink = profile.InvationLink;
+            user.Position = profile.Position;
+            user.Province = profile.Province;
+            user.AboutMe = profile.AboutMe;
+            user.Address = profile.Address;
+            user.City = profile.City;
+            user.ConvincingReasons = profile.ConvincingReasons;
+            await SaveChangesAsync();
+            return user;
         }
     }
 }

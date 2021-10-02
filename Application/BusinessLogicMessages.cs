@@ -14,7 +14,9 @@ namespace Application
             public const string RegisteredSuccess = "ثبت نام با موفقیت انجام شد";
             public const string ResetPassword = "تغییر رمز با موفقیت انجام شد";
             public const string VerificationEmail = "حساب کاربری شما با موفقیت تایید شد";
-
+            public const string UpdatedSuccessfully = "کاربر با موفقت اپدیت شد";
+            public const string UpdateAvatarSuccessfully = "عکس کاربر با موفقت اپدیت شد";
+            public const string UserDeletedSuccessfully = "کاربر با موفقیت حذف شد";
 
         }
     }

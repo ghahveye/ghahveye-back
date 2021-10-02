@@ -16,7 +16,8 @@ namespace Application
             public const string UsernameNotAvailable = "نام کاربری قابل استفاده نمی باشد.";
             public const string OtpCodeDoesNotExist = "کد اعتبارسنجی موجود نمی باشد.";
             public const string VerifyEmail = "حساب کاربری شما فعال نشده است،ابتدا آن را فعال کرده و سپس تلاش مجدد برای ورود کنید";
-
+            public const string UserNameNotEqual = "نام کاربری وارد شده با نام کاربری کاربر پیدا شده مغایرت ندارد";
+            public const string UpdateAvatarSucc = "عکس کاربر با موفقیت اپدیت شد";
         }
     }
 }

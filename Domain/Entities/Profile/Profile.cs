@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Domain.Entities;
 
-namespace Domain.Entities.Profile
+namespace Domain.Entities
 {
     public class Profile
     {

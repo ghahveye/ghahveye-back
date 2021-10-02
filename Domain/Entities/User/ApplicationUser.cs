@@ -6,12 +6,13 @@ namespace Domain.Entities
 {
     public class ApplicationUser : IdentityUser
     {
+        public bool IsDeleted { get; set; }
         public bool IsVerified { get; set; }
         public bool IsBanned { get; set; }
         public string RefreshToken { get; set; }
         public DateTime RefreshTokenExpiryTime { get; set; }
         public DateTime CreateDate { get; set; }
-        public virtual Profile.Profile Profile { get; set; }
+        public virtual Profile Profile { get; set; }
         public virtual ICollection<SocialMedia.SocialMedia> SocialMedias { get; set; }
         public virtual ICollection<UserSupporter> UserSupporters { get; set; }
         public virtual ICollection<Target> Targets { get; set; }

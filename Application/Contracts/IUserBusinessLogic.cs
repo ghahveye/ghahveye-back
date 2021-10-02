@@ -1,5 +1,6 @@
 ﻿using Application.DataTransferObjects.User;
 using Application.EntityMapping.User;
+using Domain.RequestFeature;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,9 +18,11 @@ namespace Application.Contracts
         Task<IBusinessLogicResult> ResetPass(ResetPasswordDto resetPasswordDto, Guid userId);
         Task<IBusinessLogicResult<TokensForShowDto>> RefreshAsync(TokensForRefreshDto tokensForRefreshDto, Guid userId);
         Task<IBusinessLogicResult<TokensForShowDto>> UpdateUserAsync(UserForUpdateDto userForUpdateDto, string userName, Guid userId);
+        Task<IBusinessLogicResult<TokensForShowDto>> AdminUpdateUserAsync(UserForUpdateDto userForUpdateDto, string userName, Guid userId);
         Task<IBusinessLogicResult> UpdateAvatarAsync(UpdateUserAvatarDto updateUserAvatarDto, Guid userId);
         Task<IBusinessLogicResult<UserForShowDto>> GetUserAsync(string userName);
-
-
+        Task<IBusinessLogicResult<UserForShowDto>> GetAllUserAsync(RequestParameters requestParameters);
+        Task<IBusinessLogicResult<UserForShowDto>> GetUserByIdAsyncAdmin(Guid id);
+        Task<IBusinessLogicResult> DeleteUserAsync(Guid id);
     }
 }

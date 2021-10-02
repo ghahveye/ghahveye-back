@@ -11,6 +11,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Application.Authenticate;
 using Application.Services;
+using Domain.RequestFeature;
 
 namespace Application.Implementation
 {
@@ -26,6 +27,48 @@ namespace Application.Implementation
             _auth = auth;
             _mapper = mapper;
         }
+
+        public async Task<IBusinessLogicResult> DeleteUserAsync(Guid id)
+        {
+            var user =await _repository.GetUserByIdAsync(id);
+            if (user != null)
+            {
+                await  _repository.DeleteUserAsync(id);
+                return new BusinessLogicResult { Status = 200, Success = true, Error = null, Message=BusinessLogicMessages.User.UserDeletedSuccessfully };
+
+            }
+            else return new BusinessLogicResult { Status = 404, Success = false, Error = BusinessLogicErrors.User.UserDoesNotExist };
+        }
+
+        public async Task<IBusinessLogicResult<TokensForShowDto>> AdminUpdateUserAsync(UserForUpdateDto userForUpdateDto, string userName, Guid userId)
+        {
+            var userByUserName = await _repository.GetUserByUserByNameAsync(userName);
+            var userById = await _repository.GetUserByIdAsync(userId);
+            if (userById != null && userByUserName != null)
+            {
+                if (userById.UserName == userByUserName.UserName)
+                {
+                    var profileModel = _mapper.Map<Domain.Entities.Profile>(userForUpdateDto);
+                    var UpdateUser = await _repository.UpdateUserAsync(profileModel, userId);
+
+                    var userRoles = await _repository.GetRolesAsync(userById);
+
+                    var accessToken = _auth.CreateAccessToken(userById, userRoles);
+                    var refreshToken = _auth.CreateRefreshToken();
+                    var result = new { AccessToken = accessToken, RefreshToken = refreshToken };
+                    return new BusinessLogicResult<TokensForShowDto>() { Error = null, Message = BusinessLogicMessages.User.UpdatedSuccessfully, Result = _mapper.Map<TokensForShowDto>(result) };
+                }
+                else
+                {
+                    return new BusinessLogicResult<TokensForShowDto>() { Error = BusinessLogicErrors.User.UserNameNotEqual, Status = 400, Success = false };
+                }
+            }
+            else
+            {
+                return new BusinessLogicResult<TokensForShowDto>() { Error = BusinessLogicErrors.User.UserDoesNotExist, Status = 400, Success = false };
+            }
+        }
+
         public async Task<IBusinessLogicResult> ForgetPass(ForgetPassDto forgetPassDto)
         {
             var user = await _repository.GetUserByEmailAsync(forgetPassDto.Email);
@@ -41,6 +84,11 @@ namespace Application.Implementation
             }
         }
 
+        public async Task<IBusinessLogicResult<UserForShowDto>> GetAllUserAsync(RequestParameters requestParameters)
+        {
+            var users = await _repository.GetAllUsersAsync(requestParameters);
+            return new BusinessLogicResult<UserForShowDto> { Status = 200, Success = true, Error = null, Result = _mapper.Map<UserForShowDto>(users) };
+        }
 
 
         public async Task<IBusinessLogicResult<UserForShowDto>> GetUserAsync(string userName)
@@ -49,6 +97,17 @@ namespace Application.Implementation
             if (user is null) return new BusinessLogicResult<UserForShowDto>() { Status = 404, Success = false, Error = BusinessLogicErrors.User.UserDoesNotExist };
             var userForShow = _mapper.Map<UserForShowDto>(user);
             return new BusinessLogicResult<UserForShowDto>() { Status = 200, Success = true, Error = null, Result = userForShow };
+        }
+
+        public async Task<IBusinessLogicResult<UserForShowDto>> GetUserByIdAsyncAdmin(Guid id)
+        {
+            var user = await _repository.GetUserByIdAsync(id);
+            if (user != null)
+            {
+                return new BusinessLogicResult<UserForShowDto>() { Status = 200, Success = true, Error = null, Result = _mapper.Map<UserForShowDto>(user) };
+
+            }
+            else return new BusinessLogicResult<UserForShowDto>() { Status = 404, Success = false, Error = BusinessLogicErrors.User.UserDoesNotExist };
         }
 
         public async Task<IBusinessLogicResult<TokensForShowDto>> LoginUserAsync(LoginDto loginDto)
@@ -116,9 +175,9 @@ namespace Application.Implementation
                     CreateDate = DateTime.UtcNow,
                     Email = registerDto.Email,
                 };
-                    EmailService.Send(registerDto.Email,"تایید حساب کاربری","تایید این گیخار");
-                    await _repository.CreateUserAsync(User, registerDto.Password);
-                    return new BusinessLogicResult() { Error = null, Message = BusinessLogicMessages.User.RegisteredSuccess, Status = 201, Success = true };
+                EmailService.Send(registerDto.Email, "تایید حساب کاربری", "تایید این گیخار");
+                await _repository.CreateUserAsync(User, registerDto.Password);
+                return new BusinessLogicResult() { Error = null, Message = BusinessLogicMessages.User.RegisteredSuccess, Status = 201, Success = true };
 
 
             }
@@ -127,11 +186,6 @@ namespace Application.Implementation
                 return new BusinessLogicResult() { Error = BusinessLogicErrors.User.UserAlreadyRegistered, Status = 201, Success = true };
             }
 
-        }
-
-        public Task<IBusinessLogicResult> ResetPass(ForgetPassDto forgetpassDto)
-        {
-            throw new NotImplementedException();
         }
 
         public async Task<IBusinessLogicResult> ResetPass(ResetPasswordDto resetPasswordDto, Guid userId)
@@ -150,14 +204,57 @@ namespace Application.Implementation
         }
 
 
-        public Task<IBusinessLogicResult> UpdateAvatarAsync(UpdateUserAvatarDto updateUserAvatarDto, Guid userId)
+        public async Task<IBusinessLogicResult> UpdateAvatarAsync(UpdateUserAvatarDto updateUserAvatarDto, Guid userId)
         {
-            throw new NotImplementedException();
+            var userBydId = await _repository.GetUserByIdAsync(userId);
+            if (userBydId != null)
+            {
+                var upload = Upload.UploadImage(updateUserAvatarDto);
+                if (upload != "false")
+                {
+                    await _repository.UpdateAvatarAsync(upload, userId);
+                    return new BusinessLogicResult { Error = null, Message = BusinessLogicMessages.User.UpdateAvatarSuccessfully, Status = 200, Success = true };
+                }
+                else
+                {
+                    return new BusinessLogicResult { Error = BusinessLogicErrors.User.UserDoesNotExistOrRefreshTokenIsInvalid, Status = 400, Success = false };
+                }
+            }
+            else
+            {
+                return new BusinessLogicResult { Error = BusinessLogicErrors.User.UserDoesNotExist, Status = 400, Success = false };
+
+            }
+
         }
 
-        public Task<IBusinessLogicResult<TokensForShowDto>> UpdateUserAsync(UserForUpdateDto userForUpdateDto, string userName, Guid userId)
+        public async Task<IBusinessLogicResult<TokensForShowDto>> UpdateUserAsync(UserForUpdateDto userForUpdateDto, string userName, Guid userId)
         {
-            throw new NotImplementedException();
+            var userByUserName = await _repository.GetUserByUserByNameAsync(userName);
+            var userById = await _repository.GetUserByIdAsync(userId);
+            if (userById != null && userByUserName != null)
+            {
+                if (userById.UserName == userByUserName.UserName)
+                {
+                    var profileModel = _mapper.Map<Domain.Entities.Profile>(userForUpdateDto);
+                    var UpdateUser = await _repository.UpdateUserAsync(profileModel, userId);
+
+                    var userRoles = await _repository.GetRolesAsync(userById);
+
+                    var accessToken = _auth.CreateAccessToken(userById, userRoles);
+                    var refreshToken = _auth.CreateRefreshToken();
+                    var result = new { AccessToken = accessToken, RefreshToken = refreshToken };
+                    return new BusinessLogicResult<TokensForShowDto>() { Error = null, Message = BusinessLogicMessages.User.UpdatedSuccessfully, Result = _mapper.Map<TokensForShowDto>(result) };
+                }
+                else
+                {
+                    return new BusinessLogicResult<TokensForShowDto>() { Error = BusinessLogicErrors.User.UserNameNotEqual, Status = 400, Success = false };
+                }
+            }
+            else
+            {
+                return new BusinessLogicResult<TokensForShowDto>() { Error = BusinessLogicErrors.User.UserDoesNotExist, Status = 400, Success = false };
+            }
         }
 
         public async Task<IBusinessLogicResult> VerificateEmailAsync(Guid id)
@@ -174,5 +271,7 @@ namespace Application.Implementation
                 return new BusinessLogicResult<UserForShowDto>() { Status = 404, Success = false, Error = BusinessLogicErrors.User.UserDoesNotExist };
             }
         }
+
+
     }
 }
