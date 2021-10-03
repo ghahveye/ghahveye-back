@@ -26,7 +26,7 @@ namespace Ghahveye_Back
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
-
+            services.AddCors(serv=> serv.AddDefaultPolicy(pol=> pol.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin()));
             services.AddControllers();
 
             services.AddInfanstructor(Configuration);
@@ -43,7 +43,7 @@ namespace Ghahveye_Back
             app.UseSwagger();
             app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "Ghahveye_Back v1"));
             app.UseRouting();
-
+            app.UseCors();
             app.UseAuthentication();
             app.UseAuthorization();
 

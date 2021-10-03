@@ -1,5 +1,4 @@
 ﻿using Domain.Entities;
-using Domain.Entities.Profile;
 using Domain.Entities.SocialMedia;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Domain.RequestFeature
 {
-    public abstract class RequestParameters
+    public  class RequestParameters
     {
         private const int maxPageSize = 9;
         public int PageNumber { get; set; } = 1;

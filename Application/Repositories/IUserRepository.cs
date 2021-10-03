@@ -1,4 +1,5 @@
-﻿using Domain.Entities;
+﻿using Application.DataTransferObjects.User;
+using Domain.Entities;
 using Domain.RequestFeature;
 using Domain.RequestFeatures;
 using System;
@@ -12,7 +13,6 @@ namespace Application.Repositories
     public interface IUserRepository
     {
         Task CreateUserAsync(ApplicationUser user,string password);
-        Task<IEnumerable<ApplicationUser>> GetAllUsersAsync();
         Task<ApplicationUser> GetUserByIdAsync(Guid userId);
         Task<ApplicationUser> GetUserByEmailAsync(string email);
         Task<ApplicationUser> GetUserByUserByNameAsync(string userName);
@@ -23,7 +23,8 @@ namespace Application.Repositories
         Task<IList<string>> GetRolesAsync(ApplicationUser user);
         Task ResetPasswordAsync(Guid userId,string password);
         Task<bool> SaveChangesAsync();
-        Task<PagedList<ApplicationUser>> GetAllUsersAsync(RequestParameters requestParameters);
+        Task<PagedList<UserForShowDto>> GetAllUsersAsync(RequestParameters requestParameters);
         Task DeleteUserAsync(Guid id);
+        Task CreateProfile(Profile profile);
     }
 }

@@ -17,11 +17,11 @@ namespace Application.Contracts
         Task<IBusinessLogicResult> ForgetPass(ForgetPassDto forgetPassDto);
         Task<IBusinessLogicResult> ResetPass(ResetPasswordDto resetPasswordDto, Guid userId);
         Task<IBusinessLogicResult<TokensForShowDto>> RefreshAsync(TokensForRefreshDto tokensForRefreshDto, Guid userId);
-        Task<IBusinessLogicResult<TokensForShowDto>> UpdateUserAsync(UserForUpdateDto userForUpdateDto, string userName, Guid userId);
-        Task<IBusinessLogicResult<TokensForShowDto>> AdminUpdateUserAsync(UserForUpdateDto userForUpdateDto, string userName, Guid userId);
+        Task<IBusinessLogicResult<TokensForShowDto>> UpdateUserAsync(UserForUpdateDto userForUpdateDto, Guid userId);
+        Task<IBusinessLogicResult<TokensForShowDto>> AdminUpdateUserAsync(UserForUpdateDto userForUpdateDto, Guid userId);
         Task<IBusinessLogicResult> UpdateAvatarAsync(UpdateUserAvatarDto updateUserAvatarDto, Guid userId);
-        Task<IBusinessLogicResult<UserForShowDto>> GetUserAsync(string userName);
-        Task<IBusinessLogicResult<UserForShowDto>> GetAllUserAsync(RequestParameters requestParameters);
+        Task<IBusinessLogicResult<UserForShowDto>> GetUserAsync(Guid id);
+        Task<IBusinessLogicResult<IEnumerable<UserForShowDto>>> GetAllUserAsync(RequestParameters requestParameters);
         Task<IBusinessLogicResult<UserForShowDto>> GetUserByIdAsyncAdmin(Guid id);
         Task<IBusinessLogicResult> DeleteUserAsync(Guid id);
     }

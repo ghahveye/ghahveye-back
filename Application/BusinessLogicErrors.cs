@@ -18,6 +18,7 @@ namespace Application
             public const string VerifyEmail = "حساب کاربری شما فعال نشده است،ابتدا آن را فعال کرده و سپس تلاش مجدد برای ورود کنید";
             public const string UserNameNotEqual = "نام کاربری وارد شده با نام کاربری کاربر پیدا شده مغایرت ندارد";
             public const string UpdateAvatarSucc = "عکس کاربر با موفقیت اپدیت شد";
+            public const string EmailOrPasswordInvalid = "ایمیل یا رمز وارد شده اشتباه است";
         }
     }
 }

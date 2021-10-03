@@ -1,4 +1,5 @@
-﻿using Application.Repositories;
+﻿using Application.DataTransferObjects.User;
+using Application.Repositories;
 using Domain.Entities;
 using Domain.RequestFeature;
 using Domain.RequestFeatures;
@@ -30,6 +31,11 @@ namespace Infanstructor.Repository.UserRepository
             return userCheck;
         }
 
+        public async Task CreateProfile(Profile profile)
+        {
+           await  _context.Profiles.AddAsync(profile);
+        }
+
         public async Task CreateUserAsync(ApplicationUser user, string password)
         {
             await _userManager.CreateAsync(user, password);
@@ -42,16 +48,18 @@ namespace Infanstructor.Repository.UserRepository
             await  SaveChangesAsync();
         }
 
-        public async Task<IEnumerable<ApplicationUser>> GetAllUsersAsync()
-        {
-            return await _userManager.Users.ToListAsync();
-        }
+ 
 
-        public async Task<PagedList<ApplicationUser>> GetAllUsersAsync(RequestParameters requestParameters)
+        public async Task<PagedList<UserForShowDto>> GetAllUsersAsync(RequestParameters requestParameters)
         {
-            var users = await _context.Users.Where(x=> x.IsBanned == false).Where(x=> x.IsDeleted == false).OrderByDescending(x => x.CreateDate).ToListAsync();
+            var users = await _context.Users.Where(x=> x.IsBanned == false).Where(x=> x.IsDeleted == false).OrderByDescending(x => x.CreateDate).Select(x=> new UserForShowDto {
+            Email = x.Email,
+            Id =x.Id,
+            PhoneNumber=x.PhoneNumber,
+            UserName = x.UserName
+            }).ToListAsync();
 
-            return PagedList<ApplicationUser>
+            return PagedList<UserForShowDto>
                 .ToPagedList(users, requestParameters.PageNumber, requestParameters.PageSize);
         }
 
@@ -85,6 +93,7 @@ namespace Infanstructor.Repository.UserRepository
             var user = await GetUserByIdAsync(userId);
             string resetToken = await _userManager.GeneratePasswordResetTokenAsync(user);
             await _userManager.ResetPasswordAsync(user, resetToken, password);
+
         }
 
         public async Task<bool> SaveChangesAsync()
